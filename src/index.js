@@ -1,4 +1,4 @@
-// Cloudflare Worker — Portfolio Site v2
+// Cloudflare Worker — Portfolio Site v3
 // Fully self-contained HTML page (inlined CSS + JS)
 
 const html = `<!DOCTYPE html>
@@ -6,10 +6,10 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Nameesha K — Data Analyst & ML Developer. Portfolio of projects, achievements and contact." />
+  <meta name="description" content="Nameesha K - Data Analyst & ML Developer. Portfolio of projects, achievements and contact." />
   <title>Nameesha K — Portfolio</title>
 
-  <!-- ========== FAVICON: globe emoji as SVG (replaces Cloudflare default) ========== -->
+  <!-- Globe favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>" />
 
   <style>
@@ -17,13 +17,11 @@ const html = `<!DOCTYPE html>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #000000;
-      --bg-elev: #0a0a0a;
       --text: #f5f5f7;
       --text-dim: #a1a1a6;
-      --accent: #ffffff;
       --glass-bg: rgba(255, 255, 255, 0.04);
       --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-hover: rgba(255, 255, 255, 0.1);
+      --glass-hover: rgba(255, 255, 255, 0.12);
       --radius: 22px;
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
@@ -35,12 +33,48 @@ const html = `<!DOCTYPE html>
       line-height: 1.5;
       overflow-x: hidden;
       font-weight: 400;
-      text-align: center; /* ★ CHANGE 3: global center alignment */
+      text-align: center;
+      position: relative;
     }
     a { color: inherit; text-decoration: none; }
 
+    /* ---------- ★ GLOBAL ANIMATED GRADIENT BACKGROUND ---------- */
+    /* This is the SAME gradient from the hero, but now shifts across the ENTIRE page */
+    .global-bg {
+      position: fixed;
+      inset: -10%;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.35), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.28), transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.32), transparent 50%),
+        radial-gradient(circle at 30% 70%, rgba(168, 85, 247, 0.22), transparent 50%),
+        radial-gradient(circle at 70% 50%, rgba(14, 165, 233, 0.2), transparent 50%);
+      background-color: #000;
+      animation: globalDrift 16s ease-in-out infinite alternate;
+      filter: blur(60px);
+      pointer-events: none;
+      will-change: transform;
+    }
+    @keyframes globalDrift {
+      0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+      25%  { transform: translate3d(-60px, 40px, 0) scale(1.1) rotate(2deg); }
+      50%  { transform: translate3d(40px, -50px, 0) scale(1.15) rotate(-2deg); }
+      75%  { transform: translate3d(-30px, -30px, 0) scale(1.08) rotate(3deg); }
+      100% { transform: translate3d(50px, 40px, 0) scale(1.12) rotate(-3deg); }
+    }
+
+    /* Subtle overlay to keep text readable over gradient */
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+    }
+
     /* ---------- LAYOUT ---------- */
-    .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; }
     section { padding: 110px 0; position: relative; }
 
     /* ---------- NAVBAR ---------- */
@@ -48,14 +82,14 @@ const html = `<!DOCTYPE html>
       position: fixed; top: 0; left: 0; right: 0;
       z-index: 100;
       padding: 14px 0;
-      background: rgba(10, 10, 10, 0.6);
+      background: rgba(10, 10, 10, 0.55);
       backdrop-filter: saturate(180%) blur(20px);
       -webkit-backdrop-filter: saturate(180%) blur(20px);
       border-bottom: 1px solid transparent;
       transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
     }
     .nav.scrolled {
-      background: rgba(10, 10, 10, 0.88);
+      background: rgba(10, 10, 10, 0.8);
       border-bottom-color: rgba(255,255,255,0.08);
     }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; }
@@ -72,25 +106,7 @@ const html = `<!DOCTYPE html>
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
       position: relative;
-      overflow: hidden;
       padding-top: 80px;
-    }
-    /* ★ CHANGE 2: Faster, more dynamic animated gradient */
-    .hero-bg {
-      position: absolute; inset: -10%;
-      background:
-        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.35), transparent 45%),
-        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.28), transparent 45%),
-        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.32), transparent 50%),
-        radial-gradient(circle at 30% 70%, rgba(168, 85, 247, 0.22), transparent 50%);
-      animation: drift 9s ease-in-out infinite alternate;
-      filter: blur(50px);
-      z-index: 0;
-    }
-    @keyframes drift {
-      0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-      50%  { transform: translate3d(-40px, 30px, 0) scale(1.15) rotate(3deg); }
-      100% { transform: translate3d(40px, -30px, 0) scale(1.08) rotate(-3deg); }
     }
     .hero-content { position: relative; z-index: 1; max-width: 900px; padding: 0 24px; }
     .hero h1 {
@@ -125,17 +141,19 @@ const html = `<!DOCTYPE html>
     }
     .btn-primary { background: #ffffff; color: #000; }
     .btn-primary:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 14px 50px rgba(255,255,255,0.3);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 14px 50px rgba(255,255,255,0.35);
     }
     .btn-secondary {
-      background: transparent; color: var(--text);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
       border-color: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
     }
     .btn-secondary:hover {
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.15);
       border-color: rgba(255,255,255,0.4);
-      transform: translateY(-3px) scale(1.03);
+      transform: translateY(-3px) scale(1.05);
     }
 
     /* ---------- SECTION HEADERS ---------- */
@@ -152,16 +170,15 @@ const html = `<!DOCTYPE html>
       max-width: 620px; margin: 0 auto;
     }
 
-    /* ---------- ABOUT / SUMMARY ---------- */
-    /* ★ CHANGE 5: Professional summary card */
+    /* ---------- SUMMARY CARD ---------- */
     .summary-card {
       max-width: 860px; margin: 0 auto;
       padding: 48px;
-      background: var(--glass-bg);
+      background: rgba(10, 10, 10, 0.55);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
       text-align: center;
     }
     .summary-card p {
@@ -171,7 +188,7 @@ const html = `<!DOCTYPE html>
     .summary-card p:last-child { margin-bottom: 0; }
     .summary-card strong { color: var(--text); font-weight: 600; }
 
-    /* ---------- ★ CHANGE 6: ACHIEVEMENTS BANNER ---------- */
+    /* ---------- ACHIEVEMENTS BANNER ---------- */
     .banner-wrap {
       margin-top: 40px;
       max-width: 1000px;
@@ -184,11 +201,11 @@ const html = `<!DOCTYPE html>
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 0;
       padding: 28px;
-      background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(236,72,153,0.14), rgba(59,130,246,0.16));
+      background: linear-gradient(135deg, rgba(99,102,241,0.22), rgba(236,72,153,0.18), rgba(59,130,246,0.2));
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
       overflow: hidden;
     }
     .banner-item {
@@ -204,7 +221,7 @@ const html = `<!DOCTYPE html>
       right: 0; top: 20%;
       height: 60%;
       width: 1px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.12);
     }
     .banner-num {
       font-size: clamp(28px, 4vw, 40px);
@@ -227,91 +244,179 @@ const html = `<!DOCTYPE html>
       .banner-item:not(:last-child)::after { display: none; }
     }
 
-    /* ---------- PROJECT GRID ---------- */
+    /* ---------- ★ PROJECT TILES — POPPING HOVER EFFECT ---------- */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 22px;
+      gap: 24px;
       justify-items: center;
+      perspective: 1200px; /* Enables 3D pop effect */
     }
     .card {
       width: 100%;
-      background: var(--glass-bg);
+      background: rgba(10, 10, 10, 0.5);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
       padding: 32px 28px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      transition: transform 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      transition:
+        transform 0.4s var(--ease),
+        background 0.4s var(--ease),
+        border-color 0.4s var(--ease),
+        box-shadow 0.4s var(--ease);
       display: flex; flex-direction: column;
       text-align: center;
       align-items: center;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
     }
+
+    /* ★ Animated gradient border glow on hover */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: var(--radius);
+      padding: 2px;
+      background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.6),
+        rgba(236, 72, 153, 0.6),
+        rgba(59, 130, 246, 0.6),
+        rgba(168, 85, 247, 0.6));
+      background-size: 300% 300%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s var(--ease);
+      animation: borderShift 4s ease infinite;
+      pointer-events: none;
+    }
+    @keyframes borderShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ★ Inner glow overlay on hover */
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.12),
+        transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s var(--ease);
+      pointer-events: none;
+    }
+
+    /* ★ THE POP EFFECT */
     .card:hover {
-      transform: translateY(-8px) scale(1.02);
-      background: var(--glass-hover);
-      border-color: rgba(255,255,255,0.22);
-      box-shadow: 0 24px 70px rgba(0,0,0,0.5);
+      transform: translateY(-14px) scale(1.05);
+      background: rgba(20, 20, 25, 0.7);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        0 0 60px rgba(99, 102, 241, 0.25),
+        0 0 100px rgba(236, 72, 153, 0.15);
+      z-index: 2;
     }
+    .card:hover::before { opacity: 1; }
+    .card:hover::after { opacity: 1; }
+
     .card h3 {
       font-size: 22px; font-weight: 600;
       letter-spacing: -0.01em; margin-bottom: 12px;
+      position: relative; z-index: 1;
+      transition: transform 0.4s var(--ease);
     }
+    .card:hover h3 { transform: translateY(-2px); }
+
     .card p {
       color: var(--text-dim); font-size: 15px;
       line-height: 1.6; margin-bottom: 20px;
       flex-grow: 1;
+      position: relative; z-index: 1;
     }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; justify-content: center; }
+    .tags {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 20px; justify-content: center;
+      position: relative; z-index: 1;
+    }
     .tag {
       font-size: 12px;
       padding: 5px 12px;
       border-radius: 980px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
       color: var(--text-dim);
+      transition: background 0.3s var(--ease), color 0.3s var(--ease);
     }
-    .card-link {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 14px; font-weight: 500; color: #2997ff;
-      transition: gap 0.25s var(--ease), color 0.25s var(--ease);
+    .card:hover .tag {
+      background: rgba(255,255,255,0.14);
+      color: var(--text);
     }
-    .card-link:hover { gap: 10px; color: #5ab0ff; }
-    .card-link::after { content: "→"; transition: transform 0.25s var(--ease); }
 
     /* ---------- LIST GRID (achievements / skills) ---------- */
     .list-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
+      gap: 20px;
       justify-items: center;
+      perspective: 1200px;
     }
     .list-item {
       width: 100%;
       padding: 28px;
-      background: var(--glass-bg);
+      background: rgba(10, 10, 10, 0.5);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      backdrop-filter: blur(20px);
-      transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+      backdrop-filter: blur(30px);
+      transition:
+        transform 0.4s var(--ease),
+        border-color 0.4s var(--ease),
+        background 0.4s var(--ease),
+        box-shadow 0.4s var(--ease);
       text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .list-item::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: var(--radius);
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.1),
+        transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s var(--ease);
+      pointer-events: none;
     }
     .list-item:hover {
-      transform: translateY(-6px) scale(1.02);
-      border-color: rgba(255,255,255,0.22);
-      background: var(--glass-hover);
+      transform: translateY(-10px) scale(1.04);
+      border-color: rgba(255,255,255,0.25);
+      background: rgba(20, 20, 25, 0.65);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.5),
+        0 0 50px rgba(168, 85, 247, 0.2);
+      z-index: 2;
     }
-    .list-item h4 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
-    .list-item p { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; }
+    .list-item:hover::after { opacity: 1; }
+    .list-item h4 { font-size: 17px; font-weight: 600; margin-bottom: 8px; position: relative; z-index: 1; }
+    .list-item p { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; position: relative; z-index: 1; }
 
     /* ---------- CONTACT ---------- */
     .contact-box {
       max-width: 720px; margin: 0 auto;
       padding: 64px 48px;
-      background: var(--glass-bg);
+      background: rgba(10, 10, 10, 0.55);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(30px);
       text-align: center;
     }
 
@@ -320,6 +425,7 @@ const html = `<!DOCTYPE html>
       padding: 40px 0;
       border-top: 1px solid rgba(255,255,255,0.06);
       text-align: center;
+      position: relative;
     }
     .social { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
     .social a {
@@ -329,7 +435,7 @@ const html = `<!DOCTYPE html>
     .social a:hover { color: var(--text); }
     footer p { font-size: 12px; color: var(--text-dim); }
 
-    /* ---------- ★ CHANGE 2: FASTER SCROLL FADE-IN ---------- */
+    /* ---------- SCROLL FADE-IN ---------- */
     .reveal {
       opacity: 0;
       transform: translateY(20px);
@@ -351,9 +457,19 @@ const html = `<!DOCTYPE html>
     @media (max-width: 480px) {
       .nav-links a:nth-child(n+4) { display: none; }
     }
+
+    /* ---------- PERFORMANCE: reduce animation on low-end devices ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .global-bg { animation: none; }
+      .card::before { animation: none; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- ★ GLOBAL ANIMATED GRADIENT — covers entire page -->
+  <div class="global-bg"></div>
+  <div class="bg-overlay"></div>
 
   <!-- ============ NAVBAR ============ -->
   <nav class="nav" id="navbar">
@@ -370,7 +486,6 @@ const html = `<!DOCTYPE html>
 
   <!-- ============ HERO ============ -->
   <section class="hero" id="hero">
-    <div class="hero-bg"></div>
     <div class="hero-content">
       <h1 class="reveal">Data. Design. Delivered.</h1>
       <p class="reveal">Hi, I'm Nameesha K — a Data Analyst & ML Developer crafting thoughtful digital experiences.</p>
@@ -381,7 +496,7 @@ const html = `<!DOCTYPE html>
     </div>
   </section>
 
-  <!-- ============ ★ CHANGE 5: PROFESSIONAL SUMMARY ============ -->
+  <!-- ============ PROFESSIONAL SUMMARY ============ -->
   <section id="about">
     <div class="container">
       <div class="section-header reveal">
@@ -393,19 +508,18 @@ const html = `<!DOCTYPE html>
         <p>
           I'm <strong>K. Nameesha</strong> — a Computer Science engineer graduating with a
           <strong>9.26 CGPA</strong>, specializing in <strong>Data Analysis</strong> and
-          <strong>Machine Learning</strong> with strong full-stack engineering fundamentals.
+          <strong>Machine Learning</strong> with strong programming fundamentals.
         </p>
         <p>
-          Over the past few years I've shipped <strong>six production-grade projects</strong> spanning
-          AI-powered learning platforms (<em>QUOLO</em>), real-time waste-management systems
-          (<em>Green Guardian</em>, <em>WastED</em>), NLP-driven marketplaces (<em>Legal Connect India</em>),
-          predictive career analytics (<em>CareerCastAI</em>), and digital career guidance platforms
-          (<em>Abhyudaya</em>) — working across the stack with React, Node, MongoDB, Python, Flask,
+          Over the past few years I've built <strong>six production-grade projects</strong> spanning
+          AI-powered learning platforms, real-time waste-management systems, NLP-driven marketplaces,
+          predictive career analytics, and digital career guidance platforms
+          — working across the stack with React, Node, MongoDB, Python, Flask,
           TensorFlow, LangChain, and LLMs.
         </p>
         <p>
           I've competed in <strong>8+ hackathons and ideathons</strong>, winning at
-          <em>HackerWar 4.0</em>, placing 1st Runners Up at <em>Trident Triathlon</em>, and earning
+          <em>SIH Internal Hackathon - HackerWar 4.0</em>, placing 1st Runners Up at <em>Trident Triathlon</em>, and earning
           finalist recognition at <em>Code4Odisha</em> (Govt. of Odisha). I lead teams, mentor juniors,
           and thrive in high-pressure build environments.
         </p>
@@ -415,7 +529,7 @@ const html = `<!DOCTYPE html>
         </p>
       </div>
 
-      <!-- ★ CHANGE 6: ACHIEVEMENTS BANNER (right below summary) -->
+      <!-- Achievements banner -->
       <div class="banner-wrap reveal">
         <div class="banner">
           <div class="banner-item">
@@ -433,10 +547,6 @@ const html = `<!DOCTYPE html>
           <div class="banner-item">
             <div class="banner-num">6</div>
             <div class="banner-label">Live Projects</div>
-          </div>
-          <div class="banner-item">
-            <div class="banner-num">100+</div>
-            <div class="banner-label">Teams Beaten</div>
           </div>
         </div>
       </div>
@@ -459,7 +569,6 @@ const html = `<!DOCTYPE html>
             <span class="tag">React</span><span class="tag">Node</span>
             <span class="tag">MongoDB</span><span class="tag">LLMs</span><span class="tag">LangChain</span>
           </div>
-          <a href="https://github.com/NameeshaK" class="card-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
 
         <div class="card reveal">
@@ -469,7 +578,6 @@ const html = `<!DOCTYPE html>
             <span class="tag">TensorFlow</span><span class="tag">Socket.IO</span>
             <span class="tag">Maps API</span><span class="tag">Express</span>
           </div>
-          <a href="https://github.com/NameeshaK" class="card-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
 
         <div class="card reveal">
@@ -479,7 +587,6 @@ const html = `<!DOCTYPE html>
             <span class="tag">Node.js</span><span class="tag">TextBlob</span>
             <span class="tag">NLTK</span><span class="tag">Socket.IO</span>
           </div>
-          <a href="https://github.com/NameeshaK" class="card-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
 
         <div class="card reveal">
@@ -489,7 +596,6 @@ const html = `<!DOCTYPE html>
             <span class="tag">Python</span><span class="tag">Flask</span>
             <span class="tag">Jupyter</span><span class="tag">ML</span>
           </div>
-          <a href="https://github.com/NameeshaK" class="card-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
 
         <div class="card reveal">
@@ -499,7 +605,6 @@ const html = `<!DOCTYPE html>
             <span class="tag">HTML/CSS</span><span class="tag">Express</span>
             <span class="tag">Socket.IO</span><span class="tag">Chat</span>
           </div>
-          <a href="https://github.com/NameeshaK" class="card-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
 
         <div class="card reveal">
@@ -509,7 +614,6 @@ const html = `<!DOCTYPE html>
             <span class="tag">HTML/CSS</span><span class="tag">Node.js</span>
             <span class="tag">TextBlob</span><span class="tag">Sentiment</span>
           </div>
-          <a href="https://github.com/NameeshaK" class="card-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
       </div>
     </div>
@@ -567,7 +671,7 @@ const html = `<!DOCTYPE html>
     </div>
   </section>
 
-  <!-- ============ ★ CHANGE 4: CONTACT — Google Form as primary Reach Out ============ -->
+  <!-- ============ CONTACT ============ -->
   <section id="contact">
     <div class="container">
       <div class="contact-box reveal">
@@ -576,7 +680,6 @@ const html = `<!DOCTYPE html>
           <p>Open to collaborations, roles, and interesting conversations.</p>
         </div>
         <div class="btn-group">
-          <!-- Primary Reach Out → Google Form -->
           <a href="https://forms.gle/uY7chgiYZEKwbwu47" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Reach Out</a>
           <a href="mailto:nameeshak1@gmail.com" class="btn btn-secondary">Email</a>
           <a href="https://www.linkedin.com/in/nameesha-k/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">LinkedIn</a>
@@ -591,11 +694,10 @@ const html = `<!DOCTYPE html>
       <div class="social">
         <a href="https://github.com/NameeshaK" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://www.linkedin.com/in/nameesha-k/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://www.instagram.com/nameeshaism/" target="_blank" rel="noopener noreferrer">Instagram</a>
         <a href="https://forms.gle/uY7chgiYZEKwbwu47" target="_blank" rel="noopener noreferrer">Contact Form</a>
         <a href="mailto:nameeshak1@gmail.com">Email</a>
       </div>
-      <p>&copy; Thanks for stopping by! <3 </p>
+      <p>&copy; Thanks for stopping by! &lt;3</p>
     </div>
   </footer>
 
@@ -607,7 +709,7 @@ const html = `<!DOCTYPE html>
       else navbar.classList.remove('scrolled');
     }, { passive: true });
 
-    // ---------- ★ CHANGE 2: Faster, snappier fade-ins ----------
+    // ---------- Fade-in on scroll ----------
     const revealEls = document.querySelectorAll('.reveal');
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -619,9 +721,25 @@ const html = `<!DOCTYPE html>
     }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
     revealEls.forEach((el, i) => {
-      // Shorter stagger = more dynamic feel
       el.style.transitionDelay = (i % 6) * 30 + 'ms';
       io.observe(el);
+    });
+
+    // ---------- ★ MOUSE-TRACKING GLOW ON TILES ----------
+    // Makes the radial glow follow the cursor inside each card for extra "pop"
+    const tiles = document.querySelectorAll('.card, .list-item');
+    tiles.forEach(tile => {
+      tile.addEventListener('mousemove', (e) => {
+        const rect = tile.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        tile.style.setProperty('--mx', x + '%');
+        tile.style.setProperty('--my', y + '%');
+      });
+      tile.addEventListener('mouseleave', () => {
+        tile.style.setProperty('--mx', '50%');
+        tile.style.setProperty('--my', '50%');
+      });
     });
   </script>
 </body>
