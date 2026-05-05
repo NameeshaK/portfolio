@@ -1,4 +1,4 @@
-// Cloudflare Worker — Portfolio Site v3
+// Cloudflare Worker — Portfolio Site v4
 // Fully self-contained HTML page (inlined CSS + JS)
 
 const html = `<!DOCTYPE html>
@@ -9,7 +9,6 @@ const html = `<!DOCTYPE html>
   <meta name="description" content="Nameesha K - Data Analyst & ML Developer. Portfolio of projects, achievements and contact." />
   <title>Nameesha K — Portfolio</title>
 
-  <!-- Globe favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>" />
 
   <style>
@@ -19,9 +18,7 @@ const html = `<!DOCTYPE html>
       --bg: #000000;
       --text: #f5f5f7;
       --text-dim: #a1a1a6;
-      --glass-bg: rgba(255, 255, 255, 0.04);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-hover: rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.1);
       --radius: 22px;
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
@@ -38,8 +35,7 @@ const html = `<!DOCTYPE html>
     }
     a { color: inherit; text-decoration: none; }
 
-    /* ---------- ★ GLOBAL ANIMATED GRADIENT BACKGROUND ---------- */
-    /* This is the SAME gradient from the hero, but now shifts across the ENTIRE page */
+    /* ---------- GLOBAL ANIMATED GRADIENT BACKGROUND ---------- */
     .global-bg {
       position: fixed;
       inset: -10%;
@@ -63,13 +59,11 @@ const html = `<!DOCTYPE html>
       75%  { transform: translate3d(-30px, -30px, 0) scale(1.08) rotate(3deg); }
       100% { transform: translate3d(50px, 40px, 0) scale(1.12) rotate(-3deg); }
     }
-
-    /* Subtle overlay to keep text readable over gradient */
     .bg-overlay {
       position: fixed;
       inset: 0;
       z-index: -1;
-      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.35) 100%);
       pointer-events: none;
     }
 
@@ -170,11 +164,11 @@ const html = `<!DOCTYPE html>
       max-width: 620px; margin: 0 auto;
     }
 
-    /* ---------- SUMMARY CARD ---------- */
+    /* ---------- SUMMARY CARD (kept semi-opaque for readability) ---------- */
     .summary-card {
       max-width: 860px; margin: 0 auto;
       padding: 48px;
-      background: rgba(10, 10, 10, 0.55);
+      background: rgba(10, 10, 10, 0.45);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
       backdrop-filter: blur(30px);
@@ -201,11 +195,10 @@ const html = `<!DOCTYPE html>
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 0;
       padding: 28px;
-      background: linear-gradient(135deg, rgba(99,102,241,0.22), rgba(236,72,153,0.18), rgba(59,130,246,0.2));
+      background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(236,72,153,0.14), rgba(59,130,246,0.16));
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
       backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
       overflow: hidden;
     }
     .banner-item {
@@ -244,27 +237,28 @@ const html = `<!DOCTYPE html>
       .banner-item:not(:last-child)::after { display: none; }
     }
 
-    /* ---------- ★ PROJECT TILES — POPPING HOVER EFFECT ---------- */
+    /* ---------- ★ PROJECT TILES — TRANSPARENT + SHINE ---------- */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 24px;
       justify-items: center;
-      perspective: 1200px; /* Enables 3D pop effect */
+      perspective: 1200px;
     }
+
+    /* ★ CHANGE 1: TILES ARE NOW FULLY TRANSPARENT */
     .card {
       width: 100%;
-      background: rgba(10, 10, 10, 0.5);
+      background: transparent; /* ← transparent */
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
       padding: 32px 28px;
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
+      backdrop-filter: blur(6px); /* very subtle blur to help legibility */
+      -webkit-backdrop-filter: blur(6px);
       transition:
-        transform 0.4s var(--ease),
-        background 0.4s var(--ease),
-        border-color 0.4s var(--ease),
-        box-shadow 0.4s var(--ease);
+        transform 0.5s var(--ease),
+        border-color 0.5s var(--ease),
+        box-shadow 0.5s var(--ease);
       display: flex; flex-direction: column;
       text-align: center;
       align-items: center;
@@ -273,85 +267,111 @@ const html = `<!DOCTYPE html>
       transform-style: preserve-3d;
     }
 
-    /* ★ Animated gradient border glow on hover */
+    /* Animated gradient border glow on hover */
     .card::before {
       content: '';
       position: absolute;
-      inset: -2px;
+      inset: -1px;
       border-radius: var(--radius);
-      padding: 2px;
+      padding: 1.5px;
       background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.6),
-        rgba(236, 72, 153, 0.6),
-        rgba(59, 130, 246, 0.6),
-        rgba(168, 85, 247, 0.6));
+        rgba(99, 102, 241, 0.7),
+        rgba(236, 72, 153, 0.7),
+        rgba(59, 130, 246, 0.7),
+        rgba(168, 85, 247, 0.7));
       background-size: 300% 300%;
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
       opacity: 0;
-      transition: opacity 0.4s var(--ease);
+      transition: opacity 0.5s var(--ease);
       animation: borderShift 4s ease infinite;
       pointer-events: none;
+      z-index: 3;
     }
     @keyframes borderShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      0%, 100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
     }
 
-    /* ★ Inner glow overlay on hover */
-    .card::after {
-      content: '';
+    /* ★ CHANGE 4: SHINE SWEEP (diagonal light sweep across the tile on hover) */
+    .card .shine {
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        100deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.08) 45%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.08) 55%,
+        transparent 80%
+      );
+      transform: skewX(-20deg);
+      pointer-events: none;
+      z-index: 2;
+      transition: left 0s; /* reset before hover */
+    }
+    .card:hover .shine {
+      animation: shineSweep 1.1s var(--ease) forwards;
+    }
+    @keyframes shineSweep {
+      0%   { left: -100%; }
+      100% { left: 150%; }
+    }
+
+    /* Mouse-follow spotlight */
+    .card .glow {
       position: absolute;
       inset: 0;
       border-radius: var(--radius);
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
-        rgba(255, 255, 255, 0.12),
-        transparent 50%);
+      background: radial-gradient(circle 180px at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.18),
+        rgba(99, 102, 241, 0.08) 40%,
+        transparent 70%);
       opacity: 0;
-      transition: opacity 0.4s var(--ease);
+      transition: opacity 0.3s var(--ease);
       pointer-events: none;
+      z-index: 1;
     }
+    .card:hover .glow { opacity: 1; }
 
-    /* ★ THE POP EFFECT */
+    /* ★ CHANGE 3: POP — smarter, tighter, more responsive */
     .card:hover {
-      transform: translateY(-14px) scale(1.05);
-      background: rgba(20, 20, 25, 0.7);
-      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-12px) scale(1.04);
+      border-color: rgba(255, 255, 255, 0.3);
       box-shadow:
-        0 30px 80px rgba(0, 0, 0, 0.6),
+        0 30px 80px rgba(0, 0, 0, 0.5),
         0 0 60px rgba(99, 102, 241, 0.25),
         0 0 100px rgba(236, 72, 153, 0.15);
       z-index: 2;
     }
     .card:hover::before { opacity: 1; }
-    .card:hover::after { opacity: 1; }
 
     .card h3 {
       font-size: 22px; font-weight: 600;
       letter-spacing: -0.01em; margin-bottom: 12px;
-      position: relative; z-index: 1;
+      position: relative; z-index: 4;
       transition: transform 0.4s var(--ease);
     }
     .card:hover h3 { transform: translateY(-2px); }
-
     .card p {
       color: var(--text-dim); font-size: 15px;
       line-height: 1.6; margin-bottom: 20px;
       flex-grow: 1;
-      position: relative; z-index: 1;
+      position: relative; z-index: 4;
     }
     .tags {
       display: flex; flex-wrap: wrap; gap: 6px;
       margin-bottom: 20px; justify-content: center;
-      position: relative; z-index: 1;
+      position: relative; z-index: 4;
     }
     .tag {
       font-size: 12px;
       padding: 5px 12px;
       border-radius: 980px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       color: var(--text-dim);
       transition: background 0.3s var(--ease), color 0.3s var(--ease);
@@ -361,7 +381,20 @@ const html = `<!DOCTYPE html>
       color: var(--text);
     }
 
-    /* ---------- LIST GRID (achievements / skills) ---------- */
+    /* ---------- ★ CHANGE 2: ACHIEVEMENTS — 2x2 GRID ---------- */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* strict 2 columns */
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+      perspective: 1200px;
+    }
+    @media (max-width: 680px) {
+      .achievements-grid { grid-template-columns: 1fr; } /* stack on mobile */
+    }
+
+    /* Skills/general list grid (stays auto-fit) */
     .list-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -369,51 +402,76 @@ const html = `<!DOCTYPE html>
       justify-items: center;
       perspective: 1200px;
     }
+
+    /* Transparent list items + shine */
     .list-item {
       width: 100%;
       padding: 28px;
-      background: rgba(10, 10, 10, 0.5);
+      background: transparent; /* ← transparent */
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      backdrop-filter: blur(30px);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       transition:
-        transform 0.4s var(--ease),
-        border-color 0.4s var(--ease),
-        background 0.4s var(--ease),
-        box-shadow 0.4s var(--ease);
+        transform 0.5s var(--ease),
+        border-color 0.5s var(--ease),
+        box-shadow 0.5s var(--ease);
       text-align: center;
       position: relative;
       overflow: hidden;
     }
-    .list-item::after {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: var(--radius);
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
-        rgba(255, 255, 255, 0.1),
-        transparent 50%);
-      opacity: 0;
-      transition: opacity 0.4s var(--ease);
+    .list-item .shine {
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        100deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.08) 45%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.08) 55%,
+        transparent 80%
+      );
+      transform: skewX(-20deg);
       pointer-events: none;
-    }
-    .list-item:hover {
-      transform: translateY(-10px) scale(1.04);
-      border-color: rgba(255,255,255,0.25);
-      background: rgba(20, 20, 25, 0.65);
-      box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.5),
-        0 0 50px rgba(168, 85, 247, 0.2);
       z-index: 2;
     }
-    .list-item:hover::after { opacity: 1; }
-    .list-item h4 { font-size: 17px; font-weight: 600; margin-bottom: 8px; position: relative; z-index: 1; }
-    .list-item p { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; position: relative; z-index: 1; }
+    .list-item:hover .shine {
+      animation: shineSweep 1.1s var(--ease) forwards;
+    }
+    .list-item .glow {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background: radial-gradient(circle 160px at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.18),
+        rgba(168, 85, 247, 0.08) 40%,
+        transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s var(--ease);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .list-item:hover .glow { opacity: 1; }
+
+    .list-item:hover {
+      transform: translateY(-10px) scale(1.04);
+      border-color: rgba(255,255,255,0.3);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        0 0 50px rgba(168, 85, 247, 0.2),
+        0 0 80px rgba(99, 102, 241, 0.15);
+      z-index: 2;
+    }
+    .list-item h4 { font-size: 17px; font-weight: 600; margin-bottom: 8px; position: relative; z-index: 4; }
+    .list-item p { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; position: relative; z-index: 4; }
 
     /* ---------- CONTACT ---------- */
     .contact-box {
       max-width: 720px; margin: 0 auto;
       padding: 64px 48px;
-      background: rgba(10, 10, 10, 0.55);
+      background: rgba(10, 10, 10, 0.4);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
       backdrop-filter: blur(30px);
@@ -458,16 +516,13 @@ const html = `<!DOCTYPE html>
       .nav-links a:nth-child(n+4) { display: none; }
     }
 
-    /* ---------- PERFORMANCE: reduce animation on low-end devices ---------- */
     @media (prefers-reduced-motion: reduce) {
-      .global-bg { animation: none; }
-      .card::before { animation: none; }
+      .global-bg, .card::before { animation: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ★ GLOBAL ANIMATED GRADIENT — covers entire page -->
   <div class="global-bg"></div>
   <div class="bg-overlay"></div>
 
@@ -529,7 +584,6 @@ const html = `<!DOCTYPE html>
         </p>
       </div>
 
-      <!-- Achievements banner -->
       <div class="banner-wrap reveal">
         <div class="banner">
           <div class="banner-item">
@@ -563,6 +617,7 @@ const html = `<!DOCTYPE html>
 
       <div class="grid">
         <div class="card reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h3>QUOLO</h3>
           <p>AI-powered learning platform that lets students interact with their study materials through summaries and Q&A, plus academic progress tracking.</p>
           <div class="tags">
@@ -572,6 +627,7 @@ const html = `<!DOCTYPE html>
         </div>
 
         <div class="card reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h3>Green Guardian</h3>
           <p>Tech-driven waste management solution connecting citizens with collectors — featuring real-time tracking and route optimization.</p>
           <div class="tags">
@@ -581,6 +637,7 @@ const html = `<!DOCTYPE html>
         </div>
 
         <div class="card reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h3>Legal Connect India</h3>
           <p>E-marketplace connecting citizens with legal service providers, powered by an ML review system and intelligent service matching.</p>
           <div class="tags">
@@ -590,6 +647,7 @@ const html = `<!DOCTYPE html>
         </div>
 
         <div class="card reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h3>CareerCastAI</h3>
           <p>Machine learning solution that predicts student career paths from performance analysis, enabling early academic intervention.</p>
           <div class="tags">
@@ -599,6 +657,7 @@ const html = `<!DOCTYPE html>
         </div>
 
         <div class="card reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h3>Abhyudaya</h3>
           <p>Digital career guidance platform addressing knowledge gaps for students in Odisha about competitive exams and career pathways.</p>
           <div class="tags">
@@ -608,6 +667,7 @@ const html = `<!DOCTYPE html>
         </div>
 
         <div class="card reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h3>WastED</h3>
           <p>Communication platform connecting citizens, Municipal Corporations, and NGOs to improve waste-management efficiency.</p>
           <div class="tags">
@@ -619,27 +679,31 @@ const html = `<!DOCTYPE html>
     </div>
   </section>
 
-  <!-- ============ ACHIEVEMENTS ============ -->
+  <!-- ============ ★ ACHIEVEMENTS — 2x2 GRID ============ -->
   <section id="achievements">
     <div class="container">
       <div class="section-header reveal">
         <h2>Achievements</h2>
         <p>A few milestones from the journey so far.</p>
       </div>
-      <div class="list-grid">
+      <div class="achievements-grid">
         <div class="list-item reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h4>HackerWar 4.0 — Winner</h4>
           <p>Won the internal hackathon for Smart India Hackathon (SIH) among 71+ teams.</p>
         </div>
         <div class="list-item reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h4>Trident Triathlon — 1st Runners Up</h4>
           <p>Placed among the top teams out of 50+ competing across Odisha.</p>
         </div>
         <div class="list-item reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h4>Code4Odisha — Finalist</h4>
           <p>Selected as a finalist at the Govt. of Odisha competition among 100+ teams.</p>
         </div>
         <div class="list-item reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h4>6× Hackathons &amp; 2× Ideathons</h4>
           <p>Consistently led and contributed to winning teams across national events.</p>
         </div>
@@ -656,14 +720,17 @@ const html = `<!DOCTYPE html>
       </div>
       <div class="list-grid">
         <div class="list-item reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h4>Technical</h4>
           <p>C++, Python, Full-Stack Web Development, Machine Learning.</p>
         </div>
         <div class="list-item reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h4>Languages</h4>
           <p>English, Hindi, Odia (Proficient) · Telugu (Conversational).</p>
         </div>
         <div class="list-item reveal">
+          <span class="glow"></span><span class="shine"></span>
           <h4>Interests</h4>
           <p>Philosophy, Sketching, Journaling.</p>
         </div>
@@ -702,7 +769,7 @@ const html = `<!DOCTYPE html>
   </footer>
 
   <script>
-    // ---------- Sticky nav opacity change on scroll ----------
+    // ---------- Sticky nav ----------
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 20) navbar.classList.add('scrolled');
@@ -719,26 +786,80 @@ const html = `<!DOCTYPE html>
         }
       });
     }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
-
     revealEls.forEach((el, i) => {
       el.style.transitionDelay = (i % 6) * 30 + 'ms';
       io.observe(el);
     });
 
-    // ---------- ★ MOUSE-TRACKING GLOW ON TILES ----------
-    // Makes the radial glow follow the cursor inside each card for extra "pop"
+    // ---------- ★ CHANGE 3: SMART CURSOR TRACKING ----------
+    // - Uses requestAnimationFrame for 60fps smoothness
+    // - Adds subtle 3D tilt based on cursor position (the tile "follows" your cursor)
+    // - Interpolates position so movement feels liquid, not jittery
     const tiles = document.querySelectorAll('.card, .list-item');
+
     tiles.forEach(tile => {
+      let targetX = 50, targetY = 50;        // target glow position (%)
+      let currentX = 50, currentY = 50;      // current interpolated position
+      let targetTiltX = 0, targetTiltY = 0;  // target 3D tilt
+      let currentTiltX = 0, currentTiltY = 0;
+      let rafId = null;
+      let isHovering = false;
+
+      function animate() {
+        // Smooth interpolation (lerp) — gives liquid, responsive feel
+        currentX += (targetX - currentX) * 0.18;
+        currentY += (targetY - currentY) * 0.18;
+        currentTiltX += (targetTiltX - currentTiltX) * 0.15;
+        currentTiltY += (targetTiltY - currentTiltY) * 0.15;
+
+        tile.style.setProperty('--mx', currentX + '%');
+        tile.style.setProperty('--my', currentY + '%');
+
+        // Combine tilt with the existing hover pop transform
+        if (isHovering) {
+          tile.style.transform =
+            'translateY(-12px) scale(1.04) ' +
+            'rotateX(' + currentTiltX + 'deg) rotateY(' + currentTiltY + 'deg)';
+        }
+
+        // Keep animating while moving
+        if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1 ||
+            Math.abs(targetTiltX - currentTiltX) > 0.05 || Math.abs(targetTiltY - currentTiltY) > 0.05) {
+          rafId = requestAnimationFrame(animate);
+        } else {
+          rafId = null;
+        }
+      }
+
+      tile.addEventListener('mouseenter', () => {
+        isHovering = true;
+      });
+
       tile.addEventListener('mousemove', (e) => {
         const rect = tile.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        tile.style.setProperty('--mx', x + '%');
-        tile.style.setProperty('--my', y + '%');
+        const x = ((e.clientX - rect.left) / rect.width);
+        const y = ((e.clientY - rect.top) / rect.height);
+
+        // Glow position in %
+        targetX = x * 100;
+        targetY = y * 100;
+
+        // 3D tilt: max ±6deg, inverted Y for natural feel
+        targetTiltY = (x - 0.5) * 10;   // rotateY: left/right
+        targetTiltX = -(y - 0.5) * 8;   // rotateX: up/down
+
+        if (!rafId) rafId = requestAnimationFrame(animate);
       });
+
       tile.addEventListener('mouseleave', () => {
-        tile.style.setProperty('--mx', '50%');
-        tile.style.setProperty('--my', '50%');
+        isHovering = false;
+        targetTiltX = 0;
+        targetTiltY = 0;
+        targetX = 50;
+        targetY = 50;
+        // Reset transform cleanly
+        tile.style.transform = '';
+        if (!rafId) rafId = requestAnimationFrame(animate);
       });
     });
   </script>
